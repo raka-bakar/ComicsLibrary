@@ -1,4 +1,4 @@
-package com.catalin.comicslibrary
+package com.catalin
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
@@ -21,7 +21,12 @@ fun getHash(timestamp: String, privateKey: String, publicKey: String): String {
 
 @Composable
 fun AttributionText(text: String) {
-    Text(text = text, modifier = Modifier.padding(start = 8.dp, top = 4.dp), fontSize = 12.sp)
+    Text(
+        text = text, modifier = Modifier.padding(
+            start = 8.dp,
+            top = 4.dp
+        ), fontSize = 12.sp
+    )
 }
 
 @Composable

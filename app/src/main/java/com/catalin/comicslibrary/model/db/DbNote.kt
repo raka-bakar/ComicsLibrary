@@ -11,14 +11,11 @@ data class DbNote(
     val characterId: Int,
     val title: String,
     val text: String
-) {
-    companion object {
-        fun fromNote(note: Note) =
-            DbNote(
-                id = 0,
-                characterId = note.characterId,
-                title = note.title,
-                text = note.text
-            )
+){
+    companion object{
+        fun fromNote(note:Note)=DbNote(id = 0,
+            characterId = note.characterId,
+            title = note.title,
+            text = note.text)
     }
 }

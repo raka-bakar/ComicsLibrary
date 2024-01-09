@@ -2,7 +2,7 @@ package com.catalin.comicslibrary.model.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.catalin.comicslibrary.comicsToString
+import com.catalin.comicsToString
 import com.catalin.comicslibrary.model.CharacterResult
 import com.catalin.comicslibrary.model.db.Constants.CHARACTER_TABLE
 

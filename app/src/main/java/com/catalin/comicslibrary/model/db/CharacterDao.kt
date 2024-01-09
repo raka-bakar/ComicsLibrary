@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CharacterDao {
-
     @Query("SELECT * FROM $CHARACTER_TABLE ORDER BY id ASC")
     fun getCharacters(): Flow<List<DbCharacter>>
 
@@ -26,5 +25,4 @@ interface CharacterDao {
 
     @Delete
     fun deleteCharacter(character: DbCharacter)
-
 }

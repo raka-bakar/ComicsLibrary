@@ -1,9 +1,17 @@
-package com.catalin.comicslibrary.view
+package com.catalin.view
 
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,26 +31,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.catalin.comicslibrary.AttributionText
-import com.catalin.comicslibrary.CharacterImage
+import com.catalin.AttributionText
+import com.catalin.CharacterImage
 import com.catalin.comicslibrary.Destination
 import com.catalin.comicslibrary.model.CharactersApiResponse
 import com.catalin.comicslibrary.model.api.NetworkResult
 import com.catalin.comicslibrary.model.connectivity.ConnectivityObservable
-import com.catalin.comicslibrary.viewmodel.LibraryApiViewModel
+import com.catalin.viewmodel.LibraryApiViewModel
+
 
 @Composable
 fun LibraryScreen(
     navController: NavHostController,
-    vm: LibraryApiViewModel,
+    viewModel: LibraryApiViewModel,
     paddingValues: PaddingValues
 ) {
-    val result by vm.result.collectAsState()
-    val text = vm.queryText.collectAsState()
-    val networkAvailable =
-        vm.networkAvailable.observe().collectAsState(ConnectivityObservable.Status.Available)
+    val result by viewModel.result.collectAsState()
+    val text = viewModel.queryText.collectAsState()
+    val networkAvailable = viewModel.networkAvailable.observe()
+        .collectAsState(initial = ConnectivityObservable.Status.Available)
 
     Column(
         modifier = Modifier
@@ -69,7 +77,7 @@ fun LibraryScreen(
 
         OutlinedTextField(
             value = text.value,
-            onValueChange = vm::onQueryUpdate,
+            onValueChange = viewModel::onQueryUpdate,
             label = { Text(text = "Character search") },
             placeholder = { Text(text = "Character") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -94,11 +102,10 @@ fun LibraryScreen(
                 }
 
                 is NetworkResult.Error -> {
-                    Text(text = "Error: ${result.message}")
+                    Text(text = "Error : ${result.message}")
                 }
             }
         }
-
     }
 }
 
@@ -113,9 +120,7 @@ fun ShowCharactersList(
             verticalArrangement = Arrangement.Top
         ) {
             result.data.attributionText?.let {
-                item {
-                    AttributionText(text = it)
-                }
+                item { AttributionText(text = it) }
             }
 
             items(characters) { character ->
@@ -134,12 +139,13 @@ fun ShowCharactersList(
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .clickable {
-                            if (character.id != null)
+                            if (character.id != null) {
                                 navController.navigate(Destination.CharacterDetail.createRoute(id))
-                            else
+                            } else {
                                 Toast
                                     .makeText(context, "Character id is null", Toast.LENGTH_SHORT)
                                     .show()
+                            }
                         }
                 ) {
                     Row(modifier = Modifier.fillMaxWidth()) {
@@ -151,18 +157,21 @@ fun ShowCharactersList(
                         )
 
                         Column(modifier = Modifier.padding(4.dp)) {
-                            Text(text = title ?: "", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                            Text(
+                                text = title ?: "", fontWeight = FontWeight.Bold, fontSize = 20.sp,
+                                color = Color.Blue
+                            )
                         }
                     }
 
-                    Text(text = description ?: "", maxLines = 4, fontSize = 14.sp)
+                    Text(
+                        text = description ?: "",
+                        maxLines = 4,
+                        fontSize = 14.sp,
+                        color = Color.Blue
+                    )
                 }
             }
         }
     }
 }
-
-
-
-
-

@@ -1,4 +1,4 @@
-package com.catalin.comicslibrary.view
+package com.catalin.view
 
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -13,7 +13,7 @@ import com.catalin.comicslibrary.Destination
 import com.catalin.comicslibrary.R
 
 @Composable
-fun CharactersBottomNav(navController: NavHostController) {
+fun CharactersBottomNav(navController: NavHostController){
     BottomNavigation(elevation = 5.dp) {
         val navBackStackEntry = navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry.value?.destination
@@ -21,23 +21,20 @@ fun CharactersBottomNav(navController: NavHostController) {
         val iconLibrary = painterResource(id = R.drawable.ic_library)
         val iconCollection = painterResource(id = R.drawable.ic_collection)
 
-        BottomNavigationItem(
-            selected = currentDestination?.route == Destination.Library.route,
-            onClick = { navController.navigate(Destination.Library.route) {
+        BottomNavigationItem(selected = currentDestination?.route == Destination.Library.route,
+            onClick = { navController.navigate(Destination.Library.route){
                 popUpTo(Destination.Library.route)
                 launchSingleTop = true
             } },
-            icon = { Icon(painter = iconLibrary, contentDescription = null) },
-            label = { Text(text = Destination.Library.route) }
+            icon = { Icon(painter = iconLibrary, contentDescription = null)},
+            label = {Text(text = Destination.Library.route)}
         )
-
-        BottomNavigationItem(
-            selected = currentDestination?.route == Destination.Collection.route,
-            onClick = { navController.navigate(Destination.Collection.route) {
+        BottomNavigationItem(selected = currentDestination?.route == Destination.Collection.route,
+            onClick = { navController.navigate(Destination.Collection.route){
                 launchSingleTop = true
             } },
-            icon = { Icon(painter = iconCollection, contentDescription = null) },
-            label = { Text(text = Destination.Collection.route) }
+            icon = { Icon(painter = iconLibrary, contentDescription = null) },
+            label = {Text(text = Destination.Collection.route)}
         )
     }
 }

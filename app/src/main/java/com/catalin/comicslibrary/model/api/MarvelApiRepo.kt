@@ -8,11 +8,13 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MarvelApiRepo(private val api: MarvelApi) {
+
+class MarvelApiRepo (private val api:MarvelApi){
     val characters = MutableStateFlow<NetworkResult<CharactersApiResponse>>(NetworkResult.Initial())
     val characterDetails = mutableStateOf<CharacterResult?>(null)
 
-    fun query(query: String) {
+
+    fun query(query:String){
         characters.value = NetworkResult.Loading()
         api.getCharacters(query)
             .enqueue(object : Callback<CharactersApiResponse> {
@@ -20,12 +22,13 @@ class MarvelApiRepo(private val api: MarvelApi) {
                     call: Call<CharactersApiResponse>,
                     response: Response<CharactersApiResponse>
                 ) {
-                    if (response.isSuccessful)
+                    if (response.isSuccessful){
                         response.body()?.let {
                             characters.value = NetworkResult.Success(it)
                         }
-                    else
+                    } else {
                         characters.value = NetworkResult.Error(response.message())
+                    }
                 }
 
                 override fun onFailure(call: Call<CharactersApiResponse>, t: Throwable) {
@@ -38,12 +41,11 @@ class MarvelApiRepo(private val api: MarvelApi) {
             })
     }
 
-    fun getSingleCharacter(id: Int?) {
+    fun getSingleCharacter(id:Int?){
         id?.let {
-            characterDetails.value =
-                characters.value.data?.data?.results?.firstOrNull { character ->
-                    character.id == id
-                }
+            characterDetails.value = characters.value.data?.data?.results?.firstOrNull{character->
+                character.id == id
+            }
         }
     }
 }

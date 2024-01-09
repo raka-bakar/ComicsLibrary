@@ -1,28 +1,31 @@
 package com.catalin.comicslibrary
 
 import android.os.Bundle
-import android.telecom.Call.Details
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.catalin.comicslibrary.ui.theme.ComicsLibraryTheme
-import com.catalin.comicslibrary.view.CharacterDetailScreen
-import com.catalin.comicslibrary.view.CharactersBottomNav
-import com.catalin.comicslibrary.view.CollectionScreen
-import com.catalin.comicslibrary.view.LibraryScreen
-import com.catalin.comicslibrary.viewmodel.CollectionDbViewModel
-import com.catalin.comicslibrary.viewmodel.LibraryApiViewModel
+import com.catalin.view.CharacterDetailScreen
+import com.catalin.view.CharactersBottomNav
+import com.catalin.view.CollectionScreen
+import com.catalin.view.LibraryScreen
+import com.catalin.viewmodel.CollectionDbViewModel
+import com.catalin.viewmodel.LibraryApiViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 sealed class Destination(val route: String) {
@@ -36,9 +39,8 @@ sealed class Destination(val route: String) {
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val lvm by viewModels<LibraryApiViewModel>()
-    private val cvm by viewModels<CollectionDbViewModel>()
-
+    private val viewModel by viewModels<LibraryApiViewModel>()
+    private val dbViewModel by viewModels<CollectionDbViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -49,7 +51,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val navController = rememberNavController()
-                    CharactersScaffold(navController = navController, lvm, cvm)
+                    CharactersScaffold(navController = navController, viewModel, dbViewModel = dbViewModel)
                 }
             }
         }
@@ -59,34 +61,39 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CharactersScaffold(
     navController: NavHostController,
-    lvm: LibraryApiViewModel,
-    cvm: CollectionDbViewModel
+    viewModel: LibraryApiViewModel,
+    dbViewModel: CollectionDbViewModel
 ) {
     val scaffoldState = rememberScaffoldState()
-    val ctx = LocalContext.current
+    val context = LocalContext.current
 
-    Scaffold(
-        scaffoldState = scaffoldState,
-        bottomBar = { CharactersBottomNav(navController = navController) }
-    ) { paddingValues ->
+    Scaffold(scaffoldState = scaffoldState,
+        bottomBar = { CharactersBottomNav(navController = navController) }) { paddingValues ->
         NavHost(navController = navController, startDestination = Destination.Library.route) {
             composable(Destination.Library.route) {
-                LibraryScreen(navController, lvm, paddingValues)
+                val result by viewModel.result.collectAsState()
+                val text = viewModel.queryText.collectAsState()
+                val networkAvailable = viewModel.networkAvailable.observe()
+                LibraryScreen(
+                    navController = navController,
+                    viewModel = viewModel,
+                    paddingValues = paddingValues
+                )
             }
             composable(Destination.Collection.route) {
-                CollectionScreen(cvm, navController)
+                CollectionScreen(dbViewModel, navController)
             }
             composable(Destination.CharacterDetail.route) { navBackStackEntry ->
                 val id = navBackStackEntry.arguments?.getString("characterId")?.toIntOrNull()
-                if (id == null)
-                    Toast.makeText(ctx, "Character id is required", Toast.LENGTH_SHORT).show()
-                else {
-                    lvm.retrieveSingleCharacter(id)
+                if (id == null) {
+                    Toast.makeText(context, "Character Id is required", Toast.LENGTH_SHORT).show()
+                } else {
+                    viewModel.retrieveSingleCharacter(id)
                     CharacterDetailScreen(
-                        lvm = lvm,
-                        cvm = cvm,
+                        viewmodel = viewModel,
                         paddingValues = paddingValues,
-                        navController = navController
+                        navController = navController,
+                        dbViewModel = dbViewModel
                     )
                 }
             }
