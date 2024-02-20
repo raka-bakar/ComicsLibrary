@@ -1,4 +1,5 @@
-A small app that show a list of Marvel heroes. It uses MVVM as the design architecture
+A small app that show a list of Marvel heroes. The data is fetched from Marvel repository.
+It uses MVVM as the design architecture
 
 Tech Stack: 
 1. Jetpack Compose
